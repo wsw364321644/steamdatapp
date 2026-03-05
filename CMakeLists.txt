@@ -28,6 +28,7 @@ set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/${CMAKE_INSTALL_LIBDIR})
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/${CMAKE_INSTALL_BINDIR})
 
 option(MSVC_STATIC_RUNTIME "static crt" OFF)
+option(DISABLE_INSTALL "Disable installation targets" OFF)
 
 if(DEFINED MSVC_STATIC_RUNTIME AND MSVC_STATIC_RUNTIME)
   if(MSVC)
@@ -71,3 +72,7 @@ ResourceDownload(
 )
 add_subdirectory(src/steam_language)
 add_subdirectory(src/steam_protobufs)
+
+if(NOT DISABLE_INSTALL)
+  ExportFromInstall(${PROJECT_NAME})
+endif()

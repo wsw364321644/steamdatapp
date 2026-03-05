@@ -20,13 +20,24 @@ file(MAKE_DIRECTORY ${ProtobufCPPOutPath})
 # endif()
 # endif()
 find_package(Protobuf REQUIRED)
-set(Protobuf_ROOT ${Protobuf_DIR}/../../../)
-cmake_path(NORMAL_PATH  Protobuf_ROOT)
-find_package(absl REQUIRED)
-set(absl_ROOT ${absl_DIR}/../../../)
-cmake_path(NORMAL_PATH  absl_ROOT)
+set(Protobuf_INCLUDE ${Protobuf_DIR}/../../../include)
+cmake_path(NORMAL_PATH Protobuf_INCLUDE)
+set(Protobuf_protoc_PATH ${Protobuf_DIR}/../../..//bin/protoc.exe)
+cmake_path(NORMAL_PATH Protobuf_protoc_PATH)
+
 set(OLD_PATH $ENV{PATH})
-set(ENV{PATH} "${absl_ROOT}/bin;$ENV{PATH}")
+find_package(absl REQUIRED)
+set(absl_PATH ${absl_DIR}/../../../bin)
+cmake_path(NORMAL_PATH absl_PATH)
+find_package(ZLIB)
+
+if(ZLIB_FOUND)
+    set(ZLIB_PATH ${ZLIB_INCLUDE_DIR}/../bin)
+    cmake_path(NORMAL_PATH ZLIB_PATH)
+    set(ENV{PATH} "${ZLIB_PATH};$ENV{PATH}")
+endif()
+
+set(ENV{PATH} "${absl_PATH};$ENV{PATH}")
 
 set(ProtoDirIndex 0)
 set(ProtoFileNameIndex 1)
@@ -196,8 +207,8 @@ foreach(FILE ${ProtobufOutFiles})
     message(STATUS "Generating C++ files from ${FILE}")
 
     execute_process(
-        COMMAND ${Protobuf_ROOT}/bin/protoc.exe
-        --proto_path=${Protobuf_ROOT}/include
+        COMMAND ${Protobuf_protoc_PATH}
+        --proto_path=${Protobuf_INCLUDE}
         --proto_path=${CMAKE_CURRENT_BINARY_DIR}
 
         # --proto_path=${ProtobufFileParentPath}
@@ -210,7 +221,7 @@ foreach(FILE ${ProtobufOutFiles})
     )
 
     if(NOT ${result} EQUAL 0)
-        message(FATAL_ERROR "Failed to generate C++ files from ${FILE} COMMAND ${Protobuf_PROTOC_EXECUTABLE} --proto_path=${Protobuf_ROOT}/include  --proto_path=${CMAKE_CURRENT_BINARY_DIR} --cpp_out=${ProtobufCPPOutPath}  output: ${output}")
+        message(FATAL_ERROR "Failed to generate C++ files from ${FILE} COMMAND ${Protobuf_protoc_PATH} --proto_path=${Protobuf_INCLUDE}  --proto_path=${CMAKE_CURRENT_BINARY_DIR} --cpp_out=${ProtobufCPPOutPath}  output: ${output}")
     endif()
 endforeach()
 
@@ -232,8 +243,10 @@ function(add_lib TARGET_NAME)
 
     target_link_libraries(${TARGET_NAME} PUBLIC protobuf::libprotobuf)
 
-    AddTargetInclude(${TARGET_NAME})
-    AddTargetInstall(${TARGET_NAME} UTILPP)
+    if(NOT DISABLE_INSTALL)
+        AddTargetInclude(${TARGET_NAME})
+        AddTargetInstall(${TARGET_NAME} ${PROJECT_NAME})
+    endif()
 endfunction()
 
 set(TARGET_NAME steam_protobufs_a)
