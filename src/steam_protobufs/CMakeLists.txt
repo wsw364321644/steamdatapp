@@ -249,10 +249,6 @@ function(add_lib TARGET_NAME)
     endif()
 endfunction()
 
-set(TARGET_NAME steam_protobufs_a)
-add_library(${TARGET_NAME} STATIC ${SourceFiles})
-add_lib(${TARGET_NAME})
-
 set(TARGET_NAME steam_protobufs)
-add_library(${TARGET_NAME} SHARED ${SourceFiles})
+add_library(${TARGET_NAME} STATIC ${SourceFiles})
 add_lib(${TARGET_NAME})

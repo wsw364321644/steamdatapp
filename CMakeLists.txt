@@ -30,13 +30,18 @@ set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/${CMAKE_INSTALL_BINDIR})
 option(MSVC_STATIC_RUNTIME "static crt" OFF)
 option(DISABLE_INSTALL "Disable installation targets" OFF)
 
-if(DEFINED MSVC_STATIC_RUNTIME AND MSVC_STATIC_RUNTIME)
+if(MSVC_STATIC_RUNTIME)
   if(MSVC)
     set(CMAKE_MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>")
-    add_definitions(-D_CRT_SECURE_NO_WARNINGS)
   endif()
 
   set(STATIC_CRT STATIC_CRT)
+else()
+  if(MSVC)
+    set(CMAKE_MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>DLL")
+  endif()
+
+  unset(STATIC_CRT)
 endif()
 
 FetchContent_Declare(
