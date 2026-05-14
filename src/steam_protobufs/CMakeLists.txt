@@ -200,6 +200,9 @@ while(TRUE)
         set(FILE_CONTENTS_SET TRUE)
     endif()
 
+    # ############################## replace Identifier
+    string(REPLACE [=[default = Identifier]=] [=[default = 0]=] FILE_CONTENTS "${FILE_CONTENTS}")
+
     file(WRITE ${OutFile} "${FILE_CONTENTS}")
 endwhile()
 
