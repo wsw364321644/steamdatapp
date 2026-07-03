@@ -95,7 +95,7 @@ while(TRUE)
     file(READ ${FILE} FILE_CONTENTS)
 
     # ################################ fix import path
-    set(regex [=[import \"[^"]+\"\;]=])
+    set(regex [=[import[ \t]+((public|weak)[ \t]+)?\"[^"]+\"\;]=])
     unset(MATCH_OUT)
     string(REGEX MATCHALL ${regex} MATCH_OUT "${FILE_CONTENTS}")
 
